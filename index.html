@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talking Veggies 🥔🍅🥕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            transition: background 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        .home-page {
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-page {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: pulse 2s infinite;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #FFD93D, #95E1D3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .emoji-row {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #555;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .veggies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .veggie-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .veggie-card:hover {
+            transform: scale(1.1) rotate(5deg) !important;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .veggie-emoji {
+            font-size: 5rem;
+            margin-bottom: 15px;
+        }
+
+        .veggie-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .click-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 50px auto 0;
+        }
+
+        .confetti {
+            position: fixed;
+            font-size: 30px;
+            pointer-events: none;
+            z-index: 1000;
+            animation: fall 3s ease-in forwards;
+        }
+
+        .chat-header {
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 20px;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            height: calc(100vh - 160px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 70%;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: white;
+        }
+
+        .message.user .message-bubble {
+            background: #4ECDC4;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .send-button {
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            .veggies-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 20px;
+            }
+            .veggie-emoji {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="homePage" class="home-page">
+        <div class="header">
+            <h1 class="main-title">Talking Veggies</h1>
+            <div class="emoji-row">🥔🍅🥕🫑🧅🌶️🥦🍆🌽🥒</div>
+            <p class="subtitle">Click on any veggie to start a fun conversation! 🎉</p>
+        </div>
+
+        <div class="veggies-grid" id="veggiesGrid"></div>
+
+        <div class="footer">
+            <p style="font-size: 1.2rem; color: #555; margin-bottom: 15px;">
+                🌟 Each veggie has a unique personality and fun facts to share! 🌟
+            </p>
+            <p style="font-size: 1rem; color: #777;">
+                Made with 💚 for the hackathon
+            </p>
+        </div>
+    </div>
+
+    <div id="chatPage" class="chat-page">
+        <div id="chatHeader" class="chat-header">
+            <button class="back-button" onclick="goHome()">←</button>
+            <div id="chatEmoji" style="font-size: 2.5rem;"></div>
+            <h2 id="chatName" style="color: white; margin: 0; font-size: 1.8rem;"></h2>
+        </div>
+        <div class="chat-container">
+            <div class="messages" id="messages"></div>
+            <div class="input-container">
+                <input type="text" id="messageInput" class="message-input" placeholder="Type your message...">
+                <button class="send-button" onclick="sendMessage()">Send 📤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const veggies = [
+            {
+                name: 'Potato',
+                emoji: '🥔',
+                color: '#D4A574',
+                responses: [
+                    "Ah, I see you're interested in the spud life! 🥔",
+                    "You know, I'm basically the Swiss Army knife of vegetables!",
+                    "Fun fact: I can become chips, fries, or mashed dreams!",
+                    "I may be humble, but I feed millions! 💪",
+                    "Did someone say baked potato? Count me in!",
+                    "I'm underground famous, literally!",
+                    "Carbs aren't scary when you're this delicious!",
+                    "French fries are just my alter ego 🍟",
+                    "I'm the comfort food champion!",
+                    "Round, brown, and proud! That's me!"
+                ]
+            },
+            {
+                name: 'Tomato',
+                emoji: '🍅',
+                color: '#FF6B6B',
+                responses: [
+                    "To-may-to or to-mah-to? Either way, I'm delicious!",
+                    "I'm the secret ingredient in so many dishes! 🍝",
+                    "Fun fact: I'm technically a fruit, but shhh!",
+                    "Pizza without me? Unthinkable!",
+                    "Lycopene is my superpower! 💪",
+                    "Salsa, sauce, or fresh - I do it all!",
+                    "Red on the outside, juicy on the inside!",
+                    "I make everything better, especially burgers! 🍔",
+                    "Sun-dried, cherry, or beefsteak - I'm versatile!",
+                    "Vitamin C? I've got you covered! ☀️"
+                ]
+            },
+            {
+                name: 'Carrot',
+                emoji: '🥕',
+                color: '#FF8C42',
+                responses: [
+                    "I help you see in the dark! Well, sort of... 👀",
+                    "Orange you glad you're talking to me?",
+                    "I'm the original health snack!",
+                    "Beta-carotene is my middle name! 🧡",
+                    "Bugs Bunny made me famous!",
+                    "Raw or cooked, I'm always a treat!",
+                    "Did you know I used to be purple? True story!",
+                    "I'm great in cakes too! Carrot cake, anyone? 🍰",
+                    "Crunch, munch, repeat! That's my motto!",
+                    "Root vegetables rule, and I'm proof! 👑"
+                ]
+            },
+            {
+                name: 'Capsicum',
+                emoji: '🫑',
+                color: '#90EE90',
+                responses: [
+                    "Green, yellow, red, or orange - I'm a rainbow!",
+                    "I add color and flavor to every dish! 🌈",
+                    "Raw in salads or grilled to perfection!",
+                    "Vitamin C overload in the best way!",
+                    "Stuff me with anything - I can handle it!",
+                    "Fajitas wouldn't be the same without me!",
+                    "I'm the bell of the ball! 🔔",
+                    "Sweet, never bitter - that's my promise!",
+                    "Stir-fry superstar reporting for duty!",
+                    "I'm technically a fruit too! Mind blown? 🤯"
+                ]
+            },
+            {
+                name: 'Onion',
+                emoji: '🧅',
+                color: '#E8D5C4',
+                responses: [
+                    "I have layers, just like ogres and parfaits!",
+                    "Yes, I make you cry, but it's worth it!",
+                    "Every great dish starts with me!",
+                    "Caramelized? Now we're talking! 😋",
+                    "Raw or cooked, I'm always essential!",
+                    "The tears are just liquid happiness!",
+                    "Red, white, or yellow - I've got variety!",
+                    "I'm the foundation of flavor!",
+                    "Shrek taught everyone about my layers!",
+                    "Chopping me is an emotional experience! 😭"
+                ]
+            },
+            {
+                name: 'Chilli',
+                emoji: '🌶️',
+                color: '#DC143C',
+                responses: [
+                    "I bring the heat to every meal! 🔥",
+                    "Too hot to handle? Maybe! 😈",
+                    "From mild to wild - that's my range!",
+                    "Capsaicin is my superpower!",
+                    "Life's too short for bland food!",
+                    "Red or green, I'm always extreme!",
+                    "I wake up your taste buds!",
+                    "Handle with care... or not! 😎",
+                    "Scoville scale? I laugh at it!",
+                    "Spice isn't just a flavor, it's a lifestyle! 🌶️"
+                ]
+            },
+            {
+                name: 'Broccoli',
+                emoji: '🥦',
+                color: '#4CAF50',
+                responses: [
+                    "I'm basically a tiny tree you can eat! 🌳",
+                    "Kids may fear me, but adults love me!",
+                    "Packed with vitamins and fiber!",
+                    "Steam me, roast me, or stir-fry me!",
+                    "I'm the OG superfood!",
+                    "Green means go... go eat more broccoli!",
+                    "My florets are full of goodness!",
+                    "Cheese sauce makes everything better, including me!",
+                    "I'm cruciferous and proud! 💪",
+                    "Popeye should've eaten me instead!"
+                ]
+            },
+            {
+                name: 'Eggplant',
+                emoji: '🍆',
+                color: '#663399',
+                responses: [
+                    "Purple on the outside, creamy on the inside!",
+                    "Call me eggplant or aubergine - I don't mind!",
+                    "Grilled, baked, or fried - I'm versatile!",
+                    "Emoji fame? Yeah, I'm kind of a big deal! 😏",
+                    "Perfect for parmigiana or moussaka!",
+                    "I absorb flavors like a sponge!",
+                    "No eggs in me, but I'm still cracking!",
+                    "Mediterranean cuisine's MVP!",
+                    "Shiny, purple, and proud!",
+                    "Ratatouille wouldn't exist without me! 🍲"
+                ]
+            },
+            {
+                name: 'Corn',
+                emoji: '🌽',
+                color: '#FFD700',
+                responses: [
+                    "Pop me and I become a movie snack! 🍿",
+                    "Sweet corn is the best summer treat!",
+                    "Butter + salt + me = perfection! 🧈",
+                    "I'm technically a grain, but who's counting?",
+                    "On the cob or off - I'm always delicious!",
+                    "Golden kernels of happiness!",
+                    "Grilled with butter? Yes please!",
+                    "From tacos to salads, I'm everywhere!",
+                    "My silk is nature's floss! 😄",
+                    "Cornbread, corn chips, corn dogs - I'm iconic!"
+                ]
+            },
+            {
+                name: 'Cucumber',
+                emoji: '🥒',
+                color: '#90EE90',
+                responses: [
+                    "I'm 95% water - the ultimate hydrator! 💧",
+                    "Cool, crisp, and refreshing!",
+                    "Pickles are just my fermented cousins!",
+                    "Spa day? Put slices on your eyes!",
+                    "Salads love me, sandwiches need me!",
+                    "I'm the coolest veggie around! 😎",
+                    "Crunch factor: 100%",
+                    "Low calories, high refreshment!",
+                    "Tzatziki sauce? I'm the star ingredient!",
+                    "Sliced thin or chunky - I'm flexible!"
+                ]
+            }
+        ];
+
+        const bgColors = ['#FFE5E5', '#E5F4FF', '#FFF4E5', '#E5FFE5', '#FFE5FF', '#FFFFE5'];
+        let currentVeggie = null;
+        let usedResponses = [];
+
+        function init() {
+            const grid = document.getElementById('veggiesGrid');
+            veggies.forEach((veggie, index) => {
+                const card = document.createElement('div');
+                card.className = 'veggie-card';
+                card.style.border = `3px solid ${veggie.color}`;
+                card.style.animationDelay = `${index * 0.2}s`;
+                card.innerHTML = `
+                    <div class="veggie-emoji">${veggie.emoji}</div>
+                    <h3 class="veggie-name" style="color: ${veggie.color};">${veggie.name}</h3>
+                    <div class="click-text">
+                        💬 Click to chat!
+                    </div>
+                `;
+                card.onclick = () => selectVeggie(veggie);
+                grid.appendChild(card);
+            });
+            changeBg();
+        }
+
+        function createConfetti() {
+            const emojis = ['✨', '🎉', '⭐', '💫', '🌟'];
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-50px';
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
+        function changeBg() {
+            const color = bgColors[Math.floor(Math.random() * bgColors.length)];
+            document.getElementById('homePage').style.background = `linear-gradient(135deg, ${color} 0%, #FFF 100%)`;
+        }
+
+        function selectVeggie(veggie) {
+            createConfetti();
+            changeBg();
+            currentVeggie = veggie;
+            usedResponses = [];
+            
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatPage').style.background = `linear-gradient(135deg, ${veggie.color}20 0%, #FFF 100%)`;
+            document.getElementById('chatHeader').style.background = veggie.color;
+            document.getElementById('chatEmoji').textContent = veggie.emoji;
+            document.getElementById('chatName').textContent = veggie.name;
+            document.getElementById('messages').innerHTML = '';
+            
+            addMessage('veggie', `Hey there! I'm ${veggie.name} ${veggie.emoji}! What would you like to talk about?`);
+        }
+
+        function goHome() {
+            document.getElementById('chatPage').style.display = 'none';
+            document.getElementById('homePage').style.display = 'block';
+            document.getElementById('messageInput').value = '';
+        }
+
+        function addMessage(sender, text) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = text;
+            
+            if (sender === 'veggie') {
+                bubble.style.background = currentVeggie.color;
+            }
+            
+            messageDiv.appendChild(bubble);
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function getRandomResponse() {
+            let availableResponses = currentVeggie.responses.filter(r => !usedResponses.includes(r));
+            if (availableResponses.length === 0) {
+                usedResponses = [];
+                availableResponses = currentVeggie.responses;
+            }
+            const response = availableResponses[Math.floor(Math.random() * availableResponses.length)];
+            usedResponses.push(response);
+            return response;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            addMessage('user', text);
+            input.value = '';
+            
+            setTimeout(() => {
+                const response = getRandomResponse();
+                addMessage('veggie', response);
+            }, 1000 + Math.random() * 1000);
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
